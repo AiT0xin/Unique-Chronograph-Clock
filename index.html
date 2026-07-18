@@ -12,13 +12,13 @@
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  html,body{background:transparent}
+  html,body{background:transparent;height:100%}
   body{
     margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
     font-family:"Futura","Avenir Next","Helvetica Neue",Arial,sans-serif;color:var(--dim);
     padding:4vmin 0;transition:background-color .35s ease;
   }
-  body.dark-bg{background-color:#191919}
+  html.dark-bg,body.dark-bg{background-color:#191919}
   main{display:flex;flex-direction:column;align-items:center;gap:2.2vmin;animation:fade .9s ease both}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){main{animation:none}}
@@ -385,9 +385,26 @@ function render(){
   const t=el('title',{},hit);t.textContent='Chronograph rocker — start / stop / reset';
   hit.addEventListener('click',e=>{e.stopPropagation();rockerPress();});
   window.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();rockerPress();}});
-  // triple-click background toggle
-  const BG_KEY='journe-clock-dark-bg';
-  try{if(localStorage.getItem(BG_KEY)==='1')document.body.classList.add('dark-bg');}catch(e){}
+  // triple-click background toggle (Notion embeds this page in an iframe with
+  // no way to pass its theme in, and Notion's iframe sandbox can silently block
+  // localStorage — so persistence tries localStorage AND a cookie, each
+  // wrapped so a throw in one doesn't stop the other)
+  const BG_KEY='journeNotionDark';
+  function saveDark(on){
+    const s=on?'1':'0';
+    try{localStorage.setItem(BG_KEY,s);}catch(e){}
+    try{document.cookie=BG_KEY+'='+s+';max-age=31536000;path=/;SameSite=Lax';}catch(e){}
+  }
+  function loadDark(){
+    try{const v=localStorage.getItem(BG_KEY);if(v!==null)return v==='1';}catch(e){}
+    try{const m=document.cookie.match(new RegExp('(?:^|;\\s*)'+BG_KEY+'=([^;]*)'));if(m)return m[1]==='1';}catch(e){}
+    return false;
+  }
+  function applyDark(on){
+    document.documentElement.classList.toggle('dark-bg',on);
+    document.body.classList.toggle('dark-bg',on);
+  }
+  if(loadDark())applyDark(true);
   let clicks=[];
   document.querySelector('figure').addEventListener('click',()=>{
     const t=Date.now();
@@ -396,8 +413,8 @@ function render(){
     if(clicks.length>=3){
       clicks=[];
       const on=!document.body.classList.contains('dark-bg');
-      document.body.classList.toggle('dark-bg',on);
-      try{localStorage.setItem(BG_KEY,on?'1':'0');}catch(e){}
+      applyDark(on);
+      saveDark(on);
     }
   });
 })();

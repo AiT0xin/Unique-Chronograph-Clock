@@ -7,18 +7,31 @@ atomic time.
 Open `index.html` (or serve the folder) and the watch runs:
 
 - **Hour / minute hands** — blued steel, driven by atomic-synced time.
-- **100th-of-a-second register (SPR 1, left)** — the foudroyante hand sweeps once per
-  second, continuously.
-- **20-second register (SPR 20, right)** and **10-minute register (MPR 10, bottom)** —
-  in the default mode all three registers track the atomic cycle (position within the
-  current second / 20 s / 10 min span).
-- **Rocker at 2 o'clock** (or the space bar) — works like the real one: press to start
-  the chronograph from zero, press again to stop, press a third time to reset back to
-  atomic-cycle mode. The crown at 4 o'clock is a matching grooved rectangular knob.
-- **Triple-click** the watch to toggle a dark page background (persisted).
+- **Three chronograph registers** — SPR 1 (100th-of-a-second foudroyante), SPR 20
+  (20-second), and MPR 10 (10-minute) — sit at zero until started.
+- **Rocker at 2 o'clock** (or the space bar) — a real stopwatch: press to start from
+  zero, press again to stop, press a third time to fly back to zero. The crown at
+  4 o'clock is a matching grooved rectangular knob.
+- **Triple-click** the watch to toggle a dark page background.
 
 The rendering is watch-head only: no straps, no dial signatures, no caption — just the
 dial. Sync happens silently in the background.
+
+## Embedding in Notion or a website
+
+Once GitHub Pages is enabled for this repo (Settings → Pages → deploy from `main`,
+root), the live page is at:
+
+```
+https://ait0xin.github.io/Unique-Chronograph-Clock/
+```
+
+Paste that URL into a Notion embed block, or use it as an `<iframe src="...">` on any
+site. The page background is transparent by default so it blends into the page behind
+it; triple-click the watch for a dark `#191919` background instead (useful against a
+white Notion page). The toggle persists via **both** `localStorage` and a cookie,
+independently — Notion's iframe sandbox can silently block one or the other, so having
+both means the setting survives either way.
 
 ## Atomic sync
 
