@@ -234,10 +234,10 @@ function buildRegister(cfg){
   txt(g,cx,cy-32,cfg.label,{'font-family':SERIF,'font-size':12.5,fill:'#3a372f','letter-spacing':1});
   // red hand
   const hand=el('g',{id:cfg.id},$('registers'));
-  el('path',{d:`M ${cx-2.3} ${cy} L ${cx-.9} ${cy-124} L ${cx} ${cy-129} L ${cx+.9} ${cy-124} L ${cx+2.3} ${cy} Z`,
+  el('path',{d:`M ${cx-2.9} ${cy} L ${cx-1.1} ${cy-124} L ${cx} ${cy-129} L ${cx+1.1} ${cy-124} L ${cx+2.9} ${cy} Z`,
     fill:'#c1121c'},hand);
-  el('rect',{x:cx-2.3,y:cy,width:4.6,height:20,fill:'#c1121c'},hand);
-  el('circle',{cx,cy:cy+29,r:10,fill:'none',stroke:'#c1121c','stroke-width':4.4},hand);
+  el('rect',{x:cx-2.9,y:cy,width:5.8,height:20,fill:'#c1121c'},hand);
+  el('circle',{cx,cy:cy+29,r:10,fill:'none',stroke:'#c1121c','stroke-width':5},hand);
   el('circle',{cx,cy,r:7.5,fill:'#c1121c'},hand);
   el('circle',{cx,cy,r:2.6,fill:'#6e0a10'},hand);
   return hand;
