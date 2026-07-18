@@ -116,9 +116,12 @@ const SERIF='Georgia,"Times New Roman",serif';
     el('rect',{x,y,width:w,height:h,rx:10,fill:'url(#crownGrad)',
       stroke:'#71777f','stroke-width':1.5},k);
     if(!opts.plain){
+      // counter-rotate so the grooves read as screen-vertical regardless of
+      // the knob's bearing around the case
+      const gr=el('g',{transform:`rotate(${-(bearingDeg-90)} ${x+w/2} 500)`},k);
       for(let i=0;i<7;i++){                    // vertical grooves
         const gx=x+8+i*5.2;
-        el('line',{x1:gx,y1:y+6,x2:gx,y2:y+h-6,stroke:'#666c74','stroke-width':2},k);
+        el('line',{x1:gx,y1:y+6,x2:gx,y2:y+h-6,stroke:'#666c74','stroke-width':2},gr);
       }
     }
     el('rect',{x,y,width:w,height:10,rx:5,fill:'#ffffff',opacity:.25},k);
