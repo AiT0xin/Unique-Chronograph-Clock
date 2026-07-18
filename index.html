@@ -116,12 +116,9 @@ const SERIF='Georgia,"Times New Roman",serif';
     el('rect',{x,y,width:w,height:h,rx:10,fill:'url(#crownGrad)',
       stroke:'#71777f','stroke-width':1.5},k);
     if(!opts.plain){
-      // counter-rotate so the grooves read as screen-vertical regardless of
-      // the knob's bearing around the case
-      const gr=el('g',{transform:`rotate(${-(bearingDeg-90)} ${x+w/2} 500)`},k);
-      for(let i=0;i<7;i++){                    // vertical grooves
-        const gx=x+8+i*5.2;
-        el('line',{x1:gx,y1:y+6,x2:gx,y2:y+h-6,stroke:'#666c74','stroke-width':2},gr);
+      for(let i=0;i<7;i++){                    // grooves, vertical across the
+        const gx=x+8+i*5.2;                     // knob's own short axis
+        el('line',{x1:gx,y1:y+6,x2:gx,y2:y+h-6,stroke:'#666c74','stroke-width':2},k);
       }
     }
     el('rect',{x,y,width:w,height:10,rx:5,fill:'#ffffff',opacity:.25},k);
@@ -237,10 +234,10 @@ function buildRegister(cfg){
   txt(g,cx,cy-32,cfg.label,{'font-family':SERIF,'font-size':12.5,fill:'#3a372f','letter-spacing':1});
   // red hand
   const hand=el('g',{id:cfg.id},$('registers'));
-  el('path',{d:`M ${cx-1.7} ${cy} L ${cx-.6} ${cy-124} L ${cx} ${cy-129} L ${cx+.6} ${cy-124} L ${cx+1.7} ${cy} Z`,
+  el('path',{d:`M ${cx-2.3} ${cy} L ${cx-.9} ${cy-124} L ${cx} ${cy-129} L ${cx+.9} ${cy-124} L ${cx+2.3} ${cy} Z`,
     fill:'#c1121c'},hand);
-  el('rect',{x:cx-1.7,y:cy,width:3.4,height:20,fill:'#c1121c'},hand);
-  el('circle',{cx,cy:cy+29,r:10,fill:'none',stroke:'#c1121c','stroke-width':3.4},hand);
+  el('rect',{x:cx-2.3,y:cy,width:4.6,height:20,fill:'#c1121c'},hand);
+  el('circle',{cx,cy:cy+29,r:10,fill:'none',stroke:'#c1121c','stroke-width':4.4},hand);
   el('circle',{cx,cy,r:7.5,fill:'#c1121c'},hand);
   el('circle',{cx,cy,r:2.6,fill:'#6e0a10'},hand);
   return hand;
