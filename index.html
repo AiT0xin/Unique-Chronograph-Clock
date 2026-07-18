@@ -116,9 +116,9 @@ const SERIF='Georgia,"Times New Roman",serif';
     el('rect',{x,y,width:w,height:h,rx:10,fill:'url(#crownGrad)',
       stroke:'#71777f','stroke-width':1.5},k);
     if(!opts.plain){
-      for(let i=0;i<7;i++){                    // grooves, vertical across the
-        const gx=x+8+i*5.2;                     // knob's own short axis
-        el('line',{x1:gx,y1:y+6,x2:gx,y2:y+h-6,stroke:'#666c74','stroke-width':2},k);
+      for(let i=0;i<7;i++){                    // grooves, running across the
+        const gy=y+8+i*5.2;                     // knob's own long axis
+        el('line',{x1:x+6,y1:gy,x2:x+w-6,y2:gy,stroke:'#666c74','stroke-width':2},k);
       }
     }
     el('rect',{x,y,width:w,height:10,rx:5,fill:'#ffffff',opacity:.25},k);
