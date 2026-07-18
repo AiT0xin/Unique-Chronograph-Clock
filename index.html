@@ -156,10 +156,15 @@ const SERIF='Georgia,"Times New Roman",serif';
   // share one radius each so they land on the same plane instead of each
   // digit's slightly different glyph shape nudging it off by a hair.
   const tightR={4:286.9,5:293.9,7:293.9,8:286.9};
+  // optical correction: round digits (8, 0, 3, 6, 9) sit on an identical
+  // bounding box to flat-topped digits but read as sitting higher, because
+  // curvature overshoots the eye's sense of the cap/baseline — nudge them
+  // down a hair so they look level instead of just measuring level.
+  const opticalDy={8:3,0:3,3:2,6:2,9:2};
   for(const h of [12,1,3,4,5,7,8,9,11]){
     const a=h*30,big=h===12||h===8||h===4;
     if(tightR[h]){
-      txt(g,PX(C,tightR[h],a),PY(C,tightR[h],a),String(h),
+      txt(g,PX(C,tightR[h],a),PY(C,tightR[h],a)+(opticalDy[h]||0),String(h),
         {'font-family':SERIF,'font-size':big?96:74,fill:'#26231f',dy:'0.35em'});
     }else{
       txt(g,PX(C,316,a),PY(C,316,a)+(big?34:26),String(h),
