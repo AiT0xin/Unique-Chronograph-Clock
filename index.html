@@ -160,7 +160,7 @@ const SERIF='Georgia,"Times New Roman",serif';
   // bounding box to flat-topped digits but read as sitting higher, because
   // curvature overshoots the eye's sense of the cap/baseline — nudge them
   // down a hair so they look level instead of just measuring level.
-  const opticalDy={8:3,0:3,3:2,6:2,9:2};
+  const opticalDy={8:8,0:3,3:2,6:2,9:2};
   for(const h of [12,1,3,4,5,7,8,9,11]){
     const a=h*30,big=h===12||h===8||h===4;
     if(tightR[h]){
