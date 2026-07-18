@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F.P. Journe Centigraphe Souverain — Live</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23d9d5cc'/%3E%3Ccircle cx='35' cy='40' r='16' fill='white' stroke='%23999' /%3E%3Ccircle cx='65' cy='40' r='16' fill='white' stroke='%23999'/%3E%3Ccircle cx='50' cy='66' r='16' fill='white' stroke='%23999'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#e8edf2; --mut:#7d8792; --dim:#aab2bc;
+    --ok:#6fcf97; --warn:#e2b34c; --sim:#8fa3c8;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{background:transparent}
+  body{
+    margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    font-family:"Futura","Avenir Next","Helvetica Neue",Arial,sans-serif;color:var(--dim);
+    padding:4vmin 0;transition:background-color .35s ease;
+  }
+  body.dark-bg{background-color:#191919}
+  main{display:flex;flex-direction:column;align-items:center;gap:2.2vmin;animation:fade .9s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){main{animation:none}}
+  figure{width:min(88vmin,600px);margin:0;cursor:pointer}
+  svg{display:block;width:100%;height:auto;filter:drop-shadow(0 26px 54px rgba(0,0,0,.55))}
+  #rockerHit{cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+  <figure aria-label="F.P. Journe Centigraphe Souverain, live">
+  <svg id="svg" viewBox="0 0 1000 1000" role="img">
+    <defs>
+      <linearGradient id="caseGrad" x1="0" y1="0" x2=".3" y2="1">
+        <stop offset="0" stop-color="#fbfcfd"/><stop offset=".38" stop-color="#cdd1d6"/>
+        <stop offset=".58" stop-color="#f0f2f4"/><stop offset=".85" stop-color="#a4aab2"/>
+        <stop offset="1" stop-color="#c9cdd3"/>
+      </linearGradient>
+      <linearGradient id="crownGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#eef0f2"/><stop offset=".5" stop-color="#b3b9c0"/>
+        <stop offset="1" stop-color="#83898f"/>
+      </linearGradient>
+      <radialGradient id="dialGrad" cx=".44" cy=".36" r=".85">
+        <stop offset="0" stop-color="#cfcabf"/><stop offset=".55" stop-color="#bcb7ac"/>
+        <stop offset="1" stop-color="#a09a8e"/>
+      </radialGradient>
+      <linearGradient id="plateGrad" x1="0" y1="0" x2=".2" y2="1">
+        <stop offset="0" stop-color="#c4c0b8"/><stop offset=".5" stop-color="#a5a199"/>
+        <stop offset="1" stop-color="#8e8a82"/>
+      </linearGradient>
+      <radialGradient id="regGrad" cx=".45" cy=".4" r=".9">
+        <stop offset="0" stop-color="#ffffff"/><stop offset=".75" stop-color="#f6f5f1"/>
+        <stop offset="1" stop-color="#e9e7e0"/>
+      </radialGradient>
+      <linearGradient id="blueHand" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0e2a68"/><stop offset=".45" stop-color="#2f5fc4"/>
+        <stop offset=".6" stop-color="#4d7de0"/><stop offset="1" stop-color="#10306f"/>
+      </linearGradient>
+      <radialGradient id="screwFace" cx=".38" cy=".32" r=".9">
+        <stop offset="0" stop-color="#f2f3f5"/><stop offset="1" stop-color="#a8ada9"/>
+      </radialGradient>
+      <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .6 .6 .6 0 0"/>
+        <feComposite operator="in" in2="SourceGraphic"/>
+      </filter>
+    </defs>
+    <g id="caseParts"></g>
+    <g id="dial"></g>
+    <g id="plate"></g>
+    <g id="registers"></g>
+    <g id="centerHands"></g>
+    <g id="glass"></g>
+    <g id="hitAreas"></g>
+  </svg>
+  </figure>
+</main>
+
+<script>
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+function el(tag,attrs,parent){
+  const n=document.createElementNS(NS,tag);
+  for(const k in attrs)n.setAttribute(k,attrs[k]);
+  if(parent)parent.appendChild(n);
+  return n;
+}
+function txt(parent,x,y,str,attrs){
+  const t=el('text',Object.assign({x,y,'text-anchor':'middle'},attrs),parent);
+  t.textContent=str;return t;
+}
+const rad=d=>d*Math.PI/180;
+const PX=(cx,r,a)=>cx+r*Math.sin(rad(a));
+const PY=(cy,r,a)=>cy-r*Math.cos(rad(a));
+
+/* ---------- geometry constants ---------- */
+const C=500;                       // dial centre
+const R_CASE=424,R_DIAL=372;
+const SUB={L:{cx:363,cy:392},R:{cx:637,cy:392},B:{cx:500,cy:664}};
+// tangential label rotation: flip lower-half labels so they read outward
+const rotFor=a=>{const na=((a%360)+360)%360;return (na>90&&na<270)?na+180:na;};
+const R_PLATE=156,R_REG=140;
+const SERIF='Georgia,"Times New Roman",serif';
+
+/* ---------- case, rocker, crown ---------- */
+(function(){
+  const g=$('caseParts');
+  // crown and chrono rocker: identical rectangular, vertically grooved knobs
+  function knob(bearingDeg,id){
+    const k=el('g',{transform:`rotate(${bearingDeg-90} ${C} ${C})`},g);
+    if(id)k.setAttribute('id',id);
+    el('rect',{x:914,y:466,width:46,height:68,rx:10,fill:'url(#crownGrad)',
+      stroke:'#71777f','stroke-width':1.5},k);
+    for(let i=0;i<7;i++){                      // vertical grooves
+      const x=922+i*5.2;
+      el('line',{x1:x,y1:472,x2:x,y2:528,stroke:'#666c74','stroke-width':2},k);
+    }
+    el('rect',{x:914,y:466,width:46,height:10,rx:5,fill:'#ffffff',opacity:.25},k);
+    return k;
+  }
+  knob(60,'rocker');    // chronograph rocker at 2 o'clock
+  knob(122);            // winding crown at 4 o'clock
+  // polished platinum case + bezel
+  el('circle',{cx:C,cy:C,r:R_CASE,fill:'url(#caseGrad)',stroke:'#767d86','stroke-width':2},g);
+  el('circle',{cx:C,cy:C,r:R_CASE-8,fill:'none',stroke:'#ffffff','stroke-width':2,opacity:.55},g);
+  el('circle',{cx:C,cy:C,r:R_DIAL+8,fill:'none',stroke:'#5a5f66','stroke-width':3,opacity:.6},g);
+})();
+
+/* ---------- dial base ---------- */
+(function(){
+  const g=$('dial');
+  el('circle',{cx:C,cy:C,r:R_DIAL,fill:'url(#dialGrad)'},g);
+  el('circle',{cx:C,cy:C,r:R_DIAL,fill:'#888',filter:'url(#grain)',opacity:.16},g);
+  el('circle',{cx:C,cy:C,r:R_DIAL,fill:'none',stroke:'#6d6a62','stroke-width':1.5},g);
+
+  // minute track — railroad with heavy blocks at the hours
+  const r1=350,r2=366;
+  el('circle',{cx:C,cy:C,r:r1,fill:'none',stroke:'#2a2723','stroke-width':1.4},g);
+  el('circle',{cx:C,cy:C,r:r2,fill:'none',stroke:'#2a2723','stroke-width':1.4},g);
+  for(let m=0;m<60;m++){
+    const a=m*6,hour=m%5===0;
+    el('line',{x1:PX(C,r1,a),y1:PY(C,r1,a),x2:PX(C,r2,a),y2:PY(C,r2,a),
+      stroke:'#2a2723','stroke-width':hour?11:1.6},g);
+  }
+  // Arabic numerals (2, 6, 10 hidden behind the registers, as on the real dial)
+  for(const h of [12,1,3,4,5,7,8,9,11]){
+    const a=h*30,big=h===12||h===8||h===4;
+    txt(g,PX(C,316,a),PY(C,316,a)+(big?34:26),String(h),
+      {'font-family':SERIF,'font-size':big?96:74,fill:'#26231f'});
+  }
+})();
+
+/* ---------- register plate ---------- */
+(function(){
+  const g=$('plate');
+  const shape=el('g',{},g);
+  for(const k in SUB)el('circle',{cx:SUB[k].cx,cy:SUB[k].cy,r:R_PLATE,fill:'url(#plateGrad)'},shape);
+  el('circle',{cx:431,cy:528,r:26,fill:'url(#plateGrad)'},shape);   // ogee necks joining the
+  el('circle',{cx:569,cy:528,r:26,fill:'url(#plateGrad)'},shape);   // bottom register
+  for(const k in SUB){
+    el('circle',{cx:SUB[k].cx,cy:SUB[k].cy,r:R_PLATE,fill:'none',stroke:'#6f6b63','stroke-width':1.6},g);
+    el('circle',{cx:SUB[k].cx,cy:SUB[k].cy,r:R_REG,fill:'none',stroke:'#605c55','stroke-width':2},g);
+  }
+  // plate screws
+  const screws=[[500,332],[257,286],[743,286],[243,443],[757,443],[403,768],[597,768],[431,528],[569,528]];
+  screws.forEach(([x,y],i)=>{
+    el('circle',{cx:x,cy:y,r:8,fill:'url(#screwFace)',stroke:'#5c5952','stroke-width':1.2},g);
+    const a=(i*57)%180;
+    el('line',{x1:x-6*Math.cos(rad(a)),y1:y-6*Math.sin(rad(a)),
+               x2:x+6*Math.cos(rad(a)),y2:y+6*Math.sin(rad(a)),stroke:'#55524b','stroke-width':1.8},g);
+  });
+})();
+
+/* ---------- registers ---------- */
+function buildRegister(cfg){
+  const {cx,cy}=cfg,g=el('g',{},$('registers'));
+  el('circle',{cx,cy,r:R_REG,fill:'url(#regGrad)'},g);
+  // outer fine tick ring
+  el('circle',{cx,cy,r:128,fill:'none',stroke:'#33302a','stroke-width':.9},g);
+  el('circle',{cx,cy,r:139,fill:'none',stroke:'#33302a','stroke-width':.9},g);
+  for(let i=0;i<cfg.fineTicks;i++){
+    const a=i*360/cfg.fineTicks,major=i%cfg.majorEvery===0;
+    el('line',{x1:PX(cx,major?128:132,a),y1:PY(cy,major?128:132,a),
+               x2:PX(cx,139,a),y2:PY(cy,139,a),
+               stroke:major?'#b3121a':'#43403a','stroke-width':major?1.6:.7},g);
+  }
+  // red scale
+  for(let u=cfg.redStep;u<=cfg.units;u+=cfg.redStep){
+    const a=u*360/cfg.units;
+    const t=txt(g,0,0,String(u*cfg.redFactor),
+      {'font-family':SERIF,'font-size':16,fill:'#b3121a','font-weight':'bold'});
+    t.setAttribute('transform',`translate(${PX(cx,115,a)} ${PY(cy,115,a)}) rotate(${rotFor(a)})`);
+    t.setAttribute('x',0);t.setAttribute('y',5.5);
+  }
+  el('circle',{cx,cy,r:103,fill:'none',stroke:'#43403a','stroke-width':.9},g);
+  // black calculation rings + cell grid
+  for(const ring of cfg.rings){
+    for(const [n,label] of ring.vals){
+      const a=n*360/cfg.blackUnits;
+      const t=txt(g,0,0,label,{'font-family':SERIF,'font-size':ring.fs,fill:'#26231f'});
+      t.setAttribute('transform',`translate(${PX(cx,ring.r,a)} ${PY(cy,ring.r,a)}) rotate(${rotFor(a)})`);
+      t.setAttribute('y',ring.fs*.36);
+    }
+  }
+  for(let n=0;n<cfg.blackUnits;n++){
+    const a=(n+.5)*360/cfg.blackUnits;
+    el('line',{x1:PX(cx,cfg.hubR+4,a),y1:PY(cy,cfg.hubR+4,a),
+               x2:PX(cx,103,a),y2:PY(cy,103,a),stroke:'#5a564f','stroke-width':.6},g);
+  }
+  if(cfg.midCircle)el('circle',{cx,cy,r:cfg.midCircle,fill:'none',stroke:'#5a564f','stroke-width':.6},g);
+  // silvered centre with circular graining
+  el('circle',{cx,cy,r:cfg.hubR,fill:'#f2f1ec',stroke:'#8a867e','stroke-width':.8},g);
+  for(let r=cfg.hubR-6;r>8;r-=6)el('circle',{cx,cy,r,fill:'none',stroke:'#dcd9d1','stroke-width':1},g);
+  // label window
+  el('rect',{x:cx-31,y:cy-46,width:62,height:19,rx:2,fill:'#fdfdfa',stroke:'#8a867e'},g);
+  txt(g,cx,cy-32,cfg.label,{'font-family':SERIF,'font-size':12.5,fill:'#3a372f','letter-spacing':1});
+  // red hand
+  const hand=el('g',{id:cfg.id},$('registers'));
+  el('path',{d:`M ${cx-1.7} ${cy} L ${cx-.6} ${cy-124} L ${cx} ${cy-129} L ${cx+.6} ${cy-124} L ${cx+1.7} ${cy} Z`,
+    fill:'#c1121c'},hand);
+  el('rect',{x:cx-1.7,y:cy,width:3.4,height:20,fill:'#c1121c'},hand);
+  el('circle',{cx,cy:cy+29,r:10,fill:'none',stroke:'#c1121c','stroke-width':3.4},hand);
+  el('circle',{cx,cy,r:7.5,fill:'#c1121c'},hand);
+  el('circle',{cx,cy,r:2.6,fill:'#6e0a10'},hand);
+  return hand;
+}
+const seq=(f,t,fn)=>{const o=[];for(let n=f;n<=t;n++)o.push([n,fn(n)]);return o;};
+const fmt=v=>v>=100?String(Math.round(v)):(Math.round(v*10)/10).toFixed(v%1?1:0);
+// 100th-of-a-second register — SPR 1 (one sweep per second)
+buildRegister({cx:SUB.L.cx,cy:SUB.L.cy,id:'handCenti',label:'SPR 1',
+  units:100,redStep:10,redFactor:1,fineTicks:100,majorEvery:10,blackUnits:10,hubR:70,
+  rings:[{r:88,fs:14,vals:[[0,'0']].concat(seq(1,9,n=>fmt(36000/n)))}]});
+// 20-second register — SPR 20
+buildRegister({cx:SUB.R.cx,cy:SUB.R.cy,id:'handTwenty',label:'SPR 20',
+  units:20,redStep:1,redFactor:1,fineTicks:100,majorEvery:5,blackUnits:20,hubR:52,midCircle:76,
+  rings:[{r:90,fs:11,vals:[[0,'0']].concat(seq(1,7,n=>fmt(3600/n)))},
+         {r:64,fs:9.5,vals:seq(8,19,n=>fmt(3600/n))}]});
+// 10-minute register — MPR 10 (black scale marks each half-minute)
+buildRegister({cx:SUB.B.cx,cy:SUB.B.cy,id:'handTen',label:'MPR 10',
+  units:10,redStep:1,redFactor:1,fineTicks:100,majorEvery:10,blackUnits:20,hubR:52,midCircle:76,
+  rings:[{r:90,fs:13,vals:seq(1,9,n=>fmt(180/n))},
+         {r:64,fs:9.5,vals:seq(10,19,n=>fmt(180/n))}]});
+
+/* ---------- centre hands ---------- */
+(function(){
+  const g=$('centerHands');
+  const hr=el('g',{id:'handHour'},g);
+  el('path',{d:'M -11.5 10 L -7 -158 L 0 -236 L 7 -158 L 11.5 10 Z',fill:'url(#blueHand)',
+    stroke:'#0a1e4c','stroke-width':.8,transform:`translate(${C} ${C})`},hr);
+  const mn=el('g',{id:'handMinute'},g);
+  el('path',{d:'M -9.5 10 L -6 -238 L 0 -346 L 6 -238 L 9.5 10 Z',fill:'url(#blueHand)',
+    stroke:'#0a1e4c','stroke-width':.8,transform:`translate(${C} ${C})`},mn);
+  el('circle',{cx:C,cy:C,r:13,fill:'url(#blueHand)',stroke:'#0a1e4c','stroke-width':1},g);
+  el('circle',{cx:C,cy:C,r:4.5,fill:'#c9cdd3'},g);
+})();
+
+/* ---------- crystal edge ---------- */
+el('circle',{cx:C,cy:C,r:R_DIAL+4,fill:'none',stroke:'#ffffff','stroke-width':1.6,opacity:.4},$('glass'));
+
+/* ---------- atomic time sync (multi-source consensus) ---------- */
+const params=new URLSearchParams(location.search);
+const simAt=params.get('at')?Date.parse(params.get('at')):null;
+const SYNC={offset:0,rtt:null,source:null,synced:false,state:simAt?'sim':'syncing'};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function timedFetch(url,opts){
+  const ctl=new AbortController();
+  const kill=setTimeout(()=>ctl.abort(),5000);
+  return fetch(url,Object.assign({cache:'no-store',signal:ctl.signal},opts))
+    .finally(()=>clearTimeout(kill));
+}
+async function sampleWorldTime(){
+  const t0=Date.now();
+  const res=await timedFetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+  const t1=Date.now();
+  if(!res.ok)throw new Error('http '+res.status);
+  const j=await res.json();
+  const server=Date.parse(j.utc_datetime);
+  if(!Number.isFinite(server))throw new Error('bad payload');
+  return {offset:server+(t1-t0)/2-t1,rtt:t1-t0};
+}
+async function sampleTimeApiIo(){
+  const t0=Date.now();
+  const res=await timedFetch('https://timeapi.io/api/Time/current/zone?timeZone=Etc%2FUTC');
+  const t1=Date.now();
+  if(!res.ok)throw new Error('http '+res.status);
+  const j=await res.json();
+  const m=/^([^.]+)(?:\.(\d+))?/.exec(j.dateTime||'');
+  if(!m)throw new Error('bad payload');
+  const server=Date.parse(m[1]+'Z')+(m[2]?Math.round(Number('0.'+m[2])*1000):0);
+  if(!Number.isFinite(server))throw new Error('bad payload');
+  return {offset:server+(t1-t0)/2-t1,rtt:t1-t0};
+}
+// Origin HTTP Date header: second-accurate time from whatever serves this page;
+// sub-second precision from watching the second rollover across rapid HEADs.
+async function sampleOrigin(){
+  if(location.protocol==='file:')throw new Error('no origin');
+  const url=()=>location.pathname+'?ntp='+Math.random();
+  let prev=null,last=null;
+  for(let i=0;i<9;i++){
+    const t0=Date.now();
+    const res=await timedFetch(url(),{method:'HEAD'});
+    const t1=Date.now();
+    const dh=res.headers.get('date');
+    if(!dh)throw new Error('no date header');
+    const D=Date.parse(dh);
+    if(!Number.isFinite(D))throw new Error('bad date header');
+    if(prev!==null&&D>prev)return {offset:D-(t0+t1)/2,rtt:(t1-t0)+130};
+    prev=D;last={D,t0,t1};
+    await sleep(130);
+  }
+  return {offset:last.D+500-(last.t0+last.t1)/2,rtt:1000};
+}
+async function getBest(fn,n){
+  const samples=[];
+  for(let i=0;i<n;i++){samples.push(await fn());if(i<n-1)await sleep(150);}
+  return samples.reduce((a,b)=>a.rtt<b.rtt?a:b);
+}
+let failCount=0;
+async function doSync(){
+  SYNC.state=SYNC.synced?SYNC.state:'syncing';
+  const [wta,org,tio]=await Promise.allSettled([
+    getBest(sampleWorldTime,2),sampleOrigin(),getBest(sampleTimeApiIo,2)]);
+  const cands=[];
+  if(wta.status==='fulfilled')cands.push(['WORLDTIMEAPI',wta.value]);
+  if(org.status==='fulfilled')cands.push(['ORIGIN HTTP',org.value]);
+  if(tio.status==='fulfilled')cands.push(['TIMEAPI.IO',tio.value]);
+  const agree=(a,b)=>Math.abs(a.offset-b.offset)<1500;
+  let pick=null;
+  if(cands.length===1){
+    pick=cands[0];
+    if(pick[0]==='TIMEAPI.IO'&&Math.abs(pick[1].offset)>5000)pick=null;
+  }else if(cands.length>1){
+    pick=cands.find(c=>cands.some(o=>o!==c&&agree(c[1],o[1])))
+      ||cands.find(c=>c[0]==='ORIGIN HTTP')||cands[0];
+  }
+  if(pick){
+    Object.assign(SYNC,{offset:pick[1].offset,rtt:pick[1].rtt,
+      source:pick[0],synced:true,state:'ok'});
+    failCount=0;
+    setTimeout(doSync,10*60*1000);
+    return;
+  }
+  SYNC.synced=false;SYNC.state='fail';
+  failCount++;
+  setTimeout(doSync,Math.min(300000,30000*Math.pow(2,failCount-1)));
+}
+const now=()=>simAt??(Date.now()+SYNC.offset);
+
+/* ---------- chronograph state (rocker: start → stop → reset) ----------
+   A real stopwatch on atomic time: registers rest at zero until the rocker
+   starts them. Press again to stop, a third time to fly back to zero. */
+const CHRONO={mode:'reset',start:0,frozen:0};
+function chronoT(ms){
+  if(CHRONO.mode==='run')return ms-CHRONO.start;
+  if(CHRONO.mode==='stop')return CHRONO.frozen;
+  return 0;
+}
+function rockerPress(){
+  const ms=now();
+  if(CHRONO.mode==='reset'){CHRONO.mode='run';CHRONO.start=ms;}
+  else if(CHRONO.mode==='run'){CHRONO.mode='stop';CHRONO.frozen=ms-CHRONO.start;}
+  else CHRONO.mode='reset';
+}
+
+/* ---------- live rendering ---------- */
+function render(){
+  const ms=now(),d=new Date(ms);
+  const h=d.getHours(),m=d.getMinutes(),s=d.getSeconds(),mil=d.getMilliseconds();
+  $('handMinute').setAttribute('transform',`rotate(${((m+s/60+mil/60000)*6).toFixed(3)} ${C} ${C})`);
+  $('handHour').setAttribute('transform',`rotate(${(((h%12)+m/60+s/3600)*30).toFixed(3)} ${C} ${C})`);
+  const T=Math.max(0,chronoT(ms));
+  $('handCenti').setAttribute('transform',`rotate(${((T%1000)/1000*360).toFixed(2)} ${SUB.L.cx} ${SUB.L.cy})`);
+  $('handTwenty').setAttribute('transform',`rotate(${((T%20000)/20000*360).toFixed(2)} ${SUB.R.cx} ${SUB.R.cy})`);
+  $('handTen').setAttribute('transform',`rotate(${((T%600000)/600000*360).toFixed(2)} ${SUB.B.cx} ${SUB.B.cy})`);
+  requestAnimationFrame(render);
+}
+
+/* ---------- interactions ---------- */
+(function(){
+  // generous invisible hit area over the rocker
+  const hit=el('g',{id:'rockerHit',transform:`rotate(-30 ${C} ${C})`},$('hitAreas'));
+  el('circle',{cx:944,cy:500,r:64,fill:'transparent'},hit);
+  const t=el('title',{},hit);t.textContent='Chronograph rocker — start / stop / reset';
+  hit.addEventListener('click',e=>{e.stopPropagation();rockerPress();});
+  window.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();rockerPress();}});
+  // triple-click background toggle
+  const BG_KEY='journe-clock-dark-bg';
+  try{if(localStorage.getItem(BG_KEY)==='1')document.body.classList.add('dark-bg');}catch(e){}
+  let clicks=[];
+  document.querySelector('figure').addEventListener('click',()=>{
+    const t=Date.now();
+    clicks=clicks.filter(x=>t-x<700);
+    clicks.push(t);
+    if(clicks.length>=3){
+      clicks=[];
+      const on=!document.body.classList.contains('dark-bg');
+      document.body.classList.toggle('dark-bg',on);
+      try{localStorage.setItem(BG_KEY,on?'1':'0');}catch(e){}
+    }
+  });
+})();
+
+/* ---------- boot ---------- */
+render();
+if(!simAt)doSync();
+</script>
+</body>
+</html>
